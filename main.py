@@ -42,6 +42,19 @@ def valid_df(x: float, a: float, b: float, c: float) -> bool:
     return abs(df(x, a, b, c)) > 1e-15
 
 
+def get_precision() -> float:
+    """Запрашивает у пользователя точность e для численного метода (e ∈ (0, 1))"""
+    while True:
+        try:
+            e = float(input("Введите точность вычислений (например, 0.1): "))
+            if not (0 < e < 1):
+                print("Ошибка: точность должна быть числом в интервале (0, 1)")
+                continue
+            return e
+        except ValueError:
+            print("Ошибка: введите корректное число")
+
+
 def round_to_precision(value: float, precision: float) -> float:
     """Округляет число до значащих цифр, соответствующих точности e"""
     return round(value, abs(int(f"{precision:e}".split("e")[-1])))
@@ -68,30 +81,30 @@ if a == 0:
     if b == 0:
         if c == 0:
             if d == 0:
-                print("Решение: любое число\n")
+                print("Решение: любое число")
             else:
-                print("Решений нет\n")
+                print("Решений нет")
         else:
-            print(f"Решение: x = {d / c}\n")
+            print(f"Решение: x = {-d / c}")
     else:
         disc = c ** 2 - 4 * b * d
         if disc < 0:
-            print("Вещественных решений нет\n")
+            print("Вещественных решений нет")
         elif disc == 0:
-            print(f"Решение: x = {-c / (2 * b)}\n")
+            print(f"Решение: x = {-c / (2 * b)}")
         else:
             sqrt_disc = disc ** 0.5
             x1 = (-c + sqrt_disc) / (2 * b)
             x2 = (-c - sqrt_disc) / (2 * b)
 
             if x1 == x2:
-                print(f"Решение: x = {x1}\n")
+                print(f"Решение: x = {x1}")
             else:
-                print(f"Решение: x1 = {x1}, x2 = {x2}\n")
+                print(f"Решение: x1 = {x1}, x2 = {x2}")
     exit()
 
-# реализовать ввод точности? + проверка корректности
-e = 0.1
+# запрашиваем точность
+e = get_precision()
 
 mmax = 1 + max(abs(a), abs(b), abs(c), abs(d)) / abs(a)
 mmin = -mmax
@@ -105,7 +118,7 @@ if disc <= 0:
         x = combined_method(infl_point, mmax, e, a, b, c, d)
     else:
         x = infl_point
-    print(x)
+    print(f"Решение: x = {x}")
 else:
     ex1 = (-2 * b - disc ** 0.5) / (6 * a)
     ex2 = (-2 * b + disc ** 0.5) / (6 * a)
@@ -117,7 +130,7 @@ else:
             x = combined_method(mmin, min_point, e, a, b, c, d)
         else:
             x = combined_method(max_point, mmax, e, a, b, c, d)
-        print(x)
+        print(f"Решение: x = {x}")
     elif f(min_point, a, b, c, d) * f(max_point, a, b, c, d) == 0:
         if f(infl_point, a, b, c, d) * a > 0:
             x1 = combined_method(mmin, min_point, e, a, b, c, d)
@@ -125,7 +138,7 @@ else:
         else:
             x1 = combined_method(max_point, mmax, e, a, b, c, d)
             x2 = max_point
-        print(x1, x2)
+        print(f"Решение: x1 = {x1}, x2 = {x2}")
     else:
         x1 = combined_method(mmin, min_point, e, a, b, c, d)
         if f(infl_point, a, b, c, d) * a == 0:
@@ -135,4 +148,4 @@ else:
         else:
             x2 = combined_method(min_point, infl_point, e, a, b, c, d)
         x3 = combined_method(max_point, mmax, e, a, b, c, d)
-        print(x1, x2, x3)
+        print(f"Решение: x1 = {x1}, x2 = {x2}, x3 = {x3}")
