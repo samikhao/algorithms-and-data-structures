@@ -1,4 +1,8 @@
-def user_input():
+from typing import Tuple
+
+
+def user_input() -> Tuple[float, float, float, float]:
+    """Запрашивает у пользователя коэффициенты кубического уравнения"""
     while True:
         try:
             print("Введите коэффициенты кубического уравнения через пробел (a, b, c, d):")
@@ -12,30 +16,35 @@ def user_input():
             print("Ошибка: ввод должен содержать только числа. Попробуйте снова")
 
 
-def f(x, a, b, c, d):
-    return a * x ** 3 + b * x ** 2 + c * x + d
+def f(x: float, a: float, b: float, c: float, d: float) -> float:
+    """Вычисляет значение кубического многочлена в точке x"""
+    return a * x**3 + b * x**2 + c * x + d
 
 
-def df(x, a, b, c):
-    return 3 * a * x ** 2 + 2 * b * x + c
+def df(x: float, a: float, b: float, c: float) -> float:
+    """Вычисляет первую производную кубического многочлена в точке x"""
+    return 3 * a * x**2 + 2 * b * x + c
 
 
-def d2f(x, a, b):
+def d2f(x: float, a: float, b: float) -> float:
+    """Вычисляет вторую производную кубического многочлена в точке x"""
     return 6 * a * x + 2 * b
 
 
-def chord(a, b, c, d, st, end):
+def chord(a: float, b: float, c: float, d: float, st: float, end: float) -> float:
     """Метод хорд"""
     return st - f(st, a, b, c, d) / (f(end, a, b, c, d) - f(st, a, b, c, d)) * (end - st)
 
 
-def tangent(a, b, c, d, st):
+def tangent(a: float, b: float, c: float, d: float, st: float) -> float:
     """Метод касательных"""
     return st - f(st, a, b, c, d) / df(st, a, b, c)
 
 
 def valid_df(x: float, a: float, b: float, c: float) -> bool:
-    """Проверяет, является ли производная df(x) достаточно большой, чтобы избежать деления на слишком малые значения"""
+    """Проверяет, является ли производная df(x) достаточно большой,
+    чтобы избежать деления на слишком малые значения
+    """
     return abs(df(x, a, b, c)) > 1e-15
 
 
@@ -57,7 +66,9 @@ def round_to_precision(value: float, precision: float) -> float:
     return round(value, abs(int(f"{precision:e}".split("e")[-1])))
 
 
-def combined_method(start, end, e, a, b, c, d):
+def combined_method(
+    start: float, end: float, e: float, a: float, b: float, c: float, d: float
+) -> float:
     """Комбинированный метод хорд и касательных для кубического уравнения"""
     while abs(start - end) > e:
         if f(start, a, b, c, d) * d2f(start, a, b) <= 0 and valid_df(end, a, b, c):
@@ -72,7 +83,8 @@ def combined_method(start, end, e, a, b, c, d):
     return round_to_precision((start + end) / 2, e)
 
 
-def non_cubic_solver(e, b, c, d):
+def non_cubic_solver(e: float, b: float, c: float, d: float) -> None:
+    """Решает линейное или квадратное уравнение"""
     if b == 0:
         if c == 0:
             if d == 0:
@@ -82,27 +94,29 @@ def non_cubic_solver(e, b, c, d):
         else:
             print(f"Решение: x = {round_to_precision(-d / c, e)}")
     else:
-        disc = c ** 2 - 4 * b * d
+        disc = c**2 - 4 * b * d
         if disc < 0:
             print("Вещественных решений нет")
         elif disc == 0:
             print(f"Решение: x = {round_to_precision(-c / (2 * b), e)}")
         else:
-            sqrt_disc = disc ** 0.5
+            sqrt_disc = disc**0.5
             x1 = (-c + sqrt_disc) / (2 * b)
             x2 = (-c - sqrt_disc) / (2 * b)
 
             if x1 == x2:
                 print(f"Решение: x = {round_to_precision(x1, e)}")
             else:
-                print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}")
+                print(f"Решение: x1 = {round_to_precision(x1, e)}, "
+                  f"x2 = {round_to_precision(x2, e)}")
 
 
-def cubic_solver(e, a, b, c, d):
+def cubic_solver(e: float, a: float, b: float, c: float, d: float) -> None:
+    """Решает кубическое уравнение"""
     mmax = 1 + max(abs(a), abs(b), abs(c), abs(d)) / abs(a)
     mmin = -mmax
     infl_point = -b / (3 * a)
-    disc = 4 * b ** 2 - 12 * a * c
+    disc = 4 * b**2 - 12 * a * c
 
     if disc <= 0:
         if f(infl_point, a, b, c, d) * a > 0:
@@ -114,8 +128,8 @@ def cubic_solver(e, a, b, c, d):
         print(f"Решение: x = {round_to_precision(x, e)}")
     else:
         # поиск экстремумов
-        ex1 = (-2 * b - disc ** 0.5) / (6 * a)
-        ex2 = (-2 * b + disc ** 0.5) / (6 * a)
+        ex1 = (-2 * b - disc**0.5) / (6 * a)
+        ex2 = (-2 * b + disc**0.5) / (6 * a)
         min_point = min(ex1, ex2)
         max_point = max(ex1, ex2)
 
@@ -132,7 +146,8 @@ def cubic_solver(e, a, b, c, d):
                 x1 = combined_method(mmin, min_point, e, a, b, c, d)
             else:
                 x1 = combined_method(max_point, mmax, e, a, b, c, d)
-            print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}")
+            print(f"Решение: x1 = {round_to_precision(x1, e)}, "
+                  f"x2 = {round_to_precision(x2, e)}")
 
         else:
             x1 = combined_method(mmin, min_point, e, a, b, c, d)
@@ -143,13 +158,13 @@ def cubic_solver(e, a, b, c, d):
                 x2 = combined_method(infl_point, max_point, e, a, b, c, d)
             else:
                 x2 = combined_method(min_point, infl_point, e, a, b, c, d)
-            print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}, x3 = {round_to_precision(x3, e)}")
+            print(f"Решение: x1 = {round_to_precision(x1, e)}, "
+                  f"x2 = {round_to_precision(x2, e)}, "
+                  f"x3 = {round_to_precision(x3, e)}")
 
 
-def main():
+def main() -> None:
     a, b, c, d = user_input()
-
-    # запрашиваем точность
     e = get_precision()
 
     if a == 0:
