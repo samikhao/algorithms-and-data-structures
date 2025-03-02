@@ -1,6 +1,3 @@
-from sys import exit
-
-
 def user_input():
     while True:
         try:
@@ -61,6 +58,7 @@ def round_to_precision(value: float, precision: float) -> float:
 
 
 def combined_method(start, end, e, a, b, c, d):
+    """Комбинированный метод хорд и касательных для кубического уравнения"""
     while abs(start - end) > e:
         if f(start, a, b, c, d) * d2f(start, a, b) <= 0 and valid_df(end, a, b, c):
             start = chord(a, b, c, d, start, end)
@@ -74,13 +72,7 @@ def combined_method(start, end, e, a, b, c, d):
     return round_to_precision((start + end) / 2, e)
 
 
-a, b, c, d = user_input()
-
-# запрашиваем точность
-e = get_precision()
-
-# вывести непосредственное решение в функцию, чтобы стопать программу не через exit
-if a == 0:
+def non_cubic_solver(e, b, c, d):
     if b == 0:
         if c == 0:
             if d == 0:
@@ -104,48 +96,66 @@ if a == 0:
                 print(f"Решение: x = {round_to_precision(x1, e)}")
             else:
                 print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}")
-    exit()
 
-mmax = 1 + max(abs(a), abs(b), abs(c), abs(d)) / abs(a)
-mmin = -mmax
-infl_point = -b / (3 * a)
-disc = 4 * b ** 2 - 12 * a * c
 
-if disc <= 0:
-    if f(infl_point, a, b, c, d) * a > 0:
-        x = combined_method(mmin, infl_point, e, a, b, c, d)
-    elif f(infl_point, a, b, c, d) * a < 0:
-        x = combined_method(infl_point, mmax, e, a, b, c, d)
-    else:
-        x = infl_point
-    print(f"Решение: x = {round_to_precision(x, e)}")
-else:
-    ex1 = (-2 * b - disc ** 0.5) / (6 * a)
-    ex2 = (-2 * b + disc ** 0.5) / (6 * a)
-    min_point = min(ex1, ex2)
-    max_point = max(ex1, ex2)
+def cubic_solver(e, a, b, c, d):
+    mmax = 1 + max(abs(a), abs(b), abs(c), abs(d)) / abs(a)
+    mmin = -mmax
+    infl_point = -b / (3 * a)
+    disc = 4 * b ** 2 - 12 * a * c
 
-    if f(min_point, a, b, c, d) * f(max_point, a, b, c, d) > 0:
+    if disc <= 0:
         if f(infl_point, a, b, c, d) * a > 0:
-            x = combined_method(mmin, min_point, e, a, b, c, d)
+            x = combined_method(mmin, infl_point, e, a, b, c, d)
+        elif f(infl_point, a, b, c, d) * a < 0:
+            x = combined_method(infl_point, mmax, e, a, b, c, d)
         else:
-            x = combined_method(max_point, mmax, e, a, b, c, d)
+            x = infl_point
         print(f"Решение: x = {round_to_precision(x, e)}")
-    elif f(min_point, a, b, c, d) * f(max_point, a, b, c, d) == 0:
-        if f(infl_point, a, b, c, d) * a > 0:
-            x1 = combined_method(mmin, min_point, e, a, b, c, d)
-            x2 = max_point
-        else:
-            x1 = combined_method(max_point, mmax, e, a, b, c, d)
-            x2 = max_point
-        print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}")
     else:
-        x1 = combined_method(mmin, min_point, e, a, b, c, d)
-        if f(infl_point, a, b, c, d) * a == 0:
-            x2 = infl_point
-        elif f(infl_point, a, b, c, d) * a > 0:
-            x2 = combined_method(infl_point, max_point, e, a, b, c, d)
+        # поиск экстремумов
+        ex1 = (-2 * b - disc ** 0.5) / (6 * a)
+        ex2 = (-2 * b + disc ** 0.5) / (6 * a)
+        min_point = min(ex1, ex2)
+        max_point = max(ex1, ex2)
+
+        if f(min_point, a, b, c, d) * f(max_point, a, b, c, d) > 0:
+            if f(infl_point, a, b, c, d) * a > 0:
+                x = combined_method(mmin, min_point, e, a, b, c, d)
+            else:
+                x = combined_method(max_point, mmax, e, a, b, c, d)
+            print(f"Решение: x = {round_to_precision(x, e)}")
+
+        elif f(min_point, a, b, c, d) * f(max_point, a, b, c, d) == 0:
+            x2 = max_point
+            if f(infl_point, a, b, c, d) * a > 0:
+                x1 = combined_method(mmin, min_point, e, a, b, c, d)
+            else:
+                x1 = combined_method(max_point, mmax, e, a, b, c, d)
+            print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}")
+
         else:
-            x2 = combined_method(min_point, infl_point, e, a, b, c, d)
-        x3 = combined_method(max_point, mmax, e, a, b, c, d)
-        print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}, x3 = {round_to_precision(x3, e)}")
+            x1 = combined_method(mmin, min_point, e, a, b, c, d)
+            x3 = combined_method(max_point, mmax, e, a, b, c, d)
+            if f(infl_point, a, b, c, d) * a == 0:
+                x2 = infl_point
+            elif f(infl_point, a, b, c, d) * a > 0:
+                x2 = combined_method(infl_point, max_point, e, a, b, c, d)
+            else:
+                x2 = combined_method(min_point, infl_point, e, a, b, c, d)
+            print(f"Решение: x1 = {round_to_precision(x1, e)}, x2 = {round_to_precision(x2, e)}, x3 = {round_to_precision(x3, e)}")
+
+
+def main():
+    a, b, c, d = user_input()
+
+    # запрашиваем точность
+    e = get_precision()
+
+    if a == 0:
+        non_cubic_solver(e, b, c, d)
+    else:
+        cubic_solver(e, a, b, c, d)
+
+if __name__ == "__main__":
+    main()
