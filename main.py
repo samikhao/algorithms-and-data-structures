@@ -141,11 +141,12 @@ def cubic_solver(e: float, a: float, b: float, c: float, d: float) -> None:
             print(f"Решение: x = {round_to_precision(x, e)}")
 
         elif f(min_point, a, b, c, d) * f(max_point, a, b, c, d) == 0:
-            x2 = max_point
             if f(infl_point, a, b, c, d) * a > 0:
                 x1 = combined_method(mmin, min_point, e, a, b, c, d)
+                x2 = max_point
             else:
                 x1 = combined_method(max_point, mmax, e, a, b, c, d)
+                x2 = min_point
             print(f"Решение: x1 = {round_to_precision(x1, e)}, "
                   f"x2 = {round_to_precision(x2, e)}")
 
