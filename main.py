@@ -100,9 +100,8 @@ def non_cubic_solver(e: float, b: float, c: float, d: float) -> None:
         elif disc == 0:
             print(f"Решение: x = {round_to_precision(-c / (2 * b), e)}")
         else:
-            sqrt_disc = disc**0.5
-            x1 = (-c + sqrt_disc) / (2 * b)
-            x2 = (-c - sqrt_disc) / (2 * b)
+            x1 = (-c + disc**0.5) / (2 * b)
+            x2 = (-c - disc**0.5) / (2 * b)
 
             if x1 == x2:
                 print(f"Решение: x = {round_to_precision(x1, e)}")
